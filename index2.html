@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>QuizTower</title>
+
+	<script type="text/javascript" src="js/phaser/build/phaser.min.js"></script>
+	<script type="text/javascript" src="js/quiz-tower/Boot.js"></script>
+	<script type="text/javascript" src="js/quiz-tower/Preloader.js"></script>
+	<script type="text/javascript" src="js/quiz-tower/MenuStart.js"></script>
+	<script type="text/javascript" src="js/quiz-tower/Game.js"></script>
+	<script type="text/javascript">
+		(function () {
+			var game = new Phaser.Game( 800, 600, Phaser.CANVAS, 'game' );
+			game.state.add( 'Boot', QuizTower.Boot );
+			game.state.add( 'Preloader', QuizTower.Preloader );
+			game.state.add( 'MenuStart', QuizTower.MenuStart );
+			game.state.add( 'Game', QuizTower.Game );
+
+			game.state.start( 'Boot' );
+		})();
+	</script>
+</head>
+<body>
+<h1>Quiz Tower</h1>
+</body>
+</html>
