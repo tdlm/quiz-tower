@@ -38,12 +38,6 @@ Game.MainMenu.prototype = {
 
 		this.arrows.scale.setTo(0.6,0.6);
 
-
-
-		this.titleimage = this.add.sprite(this.game.world.centerX,0,'title');
-
-		this.titleimage.anchor.setTo(0.5,0);
-
 	},
 
 

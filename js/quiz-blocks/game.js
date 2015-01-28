@@ -46,12 +46,6 @@ Game.PlayGame.prototype = {
 
 		this.game.world.bounds.height = 590;
 
-
-
-		this.logo = this.game.add.sprite(295,30,'logo');
-
-
-
 		this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.chooseblock(),this.choosecolor(),1);
 
 		this.nextblocktype = this.chooseblock();
