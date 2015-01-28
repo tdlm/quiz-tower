@@ -1,0 +1,21 @@
+module.exports = function(grunt) {
+	var quizBlocksPath = 'js/quiz-blocks';
+	grunt.initConfig({
+		concat: {
+			options: {
+				separator: ';'
+			},
+			dist: {
+				// Files in the right order to concat
+				src: [quizBlocksPath + '/load.js', quizBlocksPath + '/mainmenu.js', quizBlocksPath + '/block.js', quizBlocksPath + '/game.js', quizBlocksPath + '/init.js'],
+				dest: 'js/quiz-blocks.js' //TODO: make a package.json read from there (see https://github.com/gruntjs/grunt-contrib-concat)
+			}
+		},
+
+	});
+
+	grunt.loadNpmTasks('grunt-contrib-concat');
+
+	grunt.registerTask('default', ['concat']);
+
+};
