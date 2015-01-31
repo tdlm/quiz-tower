@@ -11,10 +11,15 @@ module.exports = function(grunt) {
 				dest: 'js/quiz-blocks.js' //TODO: make a package.json read from there (see https://github.com/gruntjs/grunt-contrib-concat)
 			}
 		},
+		watch: {
+			files: [quizBlocksPath + '/load.js', quizBlocksPath + '/mainmenu.js', quizBlocksPath + '/block.js', quizBlocksPath + '/game.js', quizBlocksPath + '/init.js'],
+			tasks: ['concat']
+		}
 
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.registerTask('default', ['concat']);
 
