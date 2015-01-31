@@ -1,6 +1,3 @@
-Game.PlayGame = function(game){
-	this.currentlevel;
-};
 /*var defaultSettings = {
 	'oldsquares': new Array(),
 	'squaresinrow': new Array(),
@@ -16,11 +13,42 @@ var squaresinrow = new Array();
 var change_rot_time = 0;
 var force_down = 0;
 var slide_time = 0;
+var force_down_max_time = 500;
+var blockHeight = 30;
+var blockWidth = 30;
 
 var KEYLEFT;
 var KEYRIGHT;
 var KEYUP;
 var KEYDOWN;
+
+Game = {};
+
+
+Game.PlayGame = function(game){};
+Game.Load = function(game){};
+
+Game.Load.prototype = {
+	preload : function(){
+		this.stage.backgroundColor = "#000";
+		this.preloadtext = this.add.text(this.game.world.centerX,this.game.world.centerY,"Loading..."+this.load.progress+"%",{ font: "20px Arial", fill: "#ff0044", align: "center" });
+		this.preloadtext.anchor.setTo(0.5,0.5);
+		var asset_dir = 'images';
+		this.load.spritesheet('play', asset_dir + '/play.png',100,80);
+		this.load.image('pause', asset_dir + '/Pause.png');
+		this.load.image('reset', asset_dir + '/refresh.png');
+		this.load.image('lose', asset_dir + '/lose.png');
+		this.load.image('arrow', asset_dir + '/arrow.png');
+		this.load.image('win', asset_dir + '/win.png');
+		this.load.spritesheet('blocks', asset_dir + '/blocks.png',30,30);
+		this.load.image('bck', asset_dir + '/Bck.png');
+	},
+
+	create : function(){
+        this.game.state.start('MainMenu');
+	}
+};
+
 
 
 Game.PlayGame.prototype = {
@@ -33,9 +61,9 @@ Game.PlayGame.prototype = {
 
 		this.game.world.bounds.y = 0;
 
-		this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 400 : gameWidth;
+		this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 280 : gameWidth - 20;
 
-		this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 600 : gameHeight;
+		this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 590 : gameHeight - 10;
 
 		this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.chooseblock(),this.choosecolor(),1);
 
@@ -161,7 +189,7 @@ Game.PlayGame.prototype = {
 
 		}
 
-		var top = this.game.world.bounds.height - 19*height - height/2;
+		var top = this.game.world.bounds.height - 19 * blockHeight - blockHeight / 2;
 
 		var num_rows,rows;
 
@@ -169,7 +197,7 @@ Game.PlayGame.prototype = {
 
 		for(var i=0;i<oldsquares.length;i++){
 
-			row = (oldsquares[i].y - top)/height;
+			row = (oldsquares[i].y - top)/blockHeight;
 
 			squaresinrow[row]++;
 
@@ -187,7 +215,7 @@ Game.PlayGame.prototype = {
 
 				for(var j=0;j<oldsquares.length;j++){
 
-					if((oldsquares[j].y - top)/height==i){
+					if((oldsquares[j].y - top)/blockHeight==i){
 
 						oldsquares[j].destroy();
 
@@ -211,11 +239,11 @@ Game.PlayGame.prototype = {
 
 				if(squaresinrow[j]==9){
 
-					row = (oldsquares[i].y - top)/height;
+					row = (oldsquares[i].y - top)/blockHeight;
 
 					if(row<j){
 
-						oldsquares[i].y += height;
+						oldsquares[i].y += blockHeight;
 
 					}
 

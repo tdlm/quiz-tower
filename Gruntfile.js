@@ -7,12 +7,12 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				// Files in the right order to concat
-				src: [quizBlocksPath + '/load.js', quizBlocksPath + '/mainmenu.js', quizBlocksPath + '/block.js', quizBlocksPath + '/game.js', quizBlocksPath + '/init.js'],
+				src: [quizBlocksPath + '/game.js', quizBlocksPath + '/mainmenu.js', quizBlocksPath + '/block.js', quizBlocksPath + '/init.js'],
 				dest: 'js/quiz-blocks.js' //TODO: make a package.json read from there (see https://github.com/gruntjs/grunt-contrib-concat)
 			}
 		},
 		watch: {
-			files: [quizBlocksPath + '/load.js', quizBlocksPath + '/mainmenu.js', quizBlocksPath + '/block.js', quizBlocksPath + '/game.js', quizBlocksPath + '/init.js'],
+			files: [quizBlocksPath + '/game.js', quizBlocksPath + '/mainmenu.js', quizBlocksPath + '/block.js', quizBlocksPath + '/init.js'],
 			tasks: ['concat']
 		}
 

@@ -20,9 +20,11 @@ Game.MainMenu.prototype = {
 
 		this.game.world.bounds.y = 0;
 
-		this.game.world.bounds.width = 400;
+		if ( typeof this.game.world.bounds.width == 'undefined' )
+			this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 400 : gameWidth;
 
-		this.game.world.bounds.height = 600;
+		if ( typeof this.game.world.bounds.height == 'undefined' )
+			this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 600 : gameHeight;
 
 		this.playbutton = this.add.button(this.game.world.centerX, this.game.world.centerY-40,'play',this.playclicked,this,1,0,2);
 
@@ -70,14 +72,6 @@ Game.LoseScreen.prototype = {
 
 	create : function(){
 
-		this.game.world.bounds.x = 0;
-
-		this.game.world.bounds.y = 0;
-
-		this.game.world.bounds.width = 400;
-
-		this.game.world.bounds.height = 600;
-
 		this.lose = this.game.add.sprite(this.game.world.centerX,this.game.world.centerY,'lose');
 
 		this.lose.anchor.setTo(0.5,0.5);
@@ -121,16 +115,6 @@ Game.WinScreen = function(game){
 Game.WinScreen.prototype = {
 
 	create : function(){
-
-		this.game.world.bounds.x = 0;
-
-		this.game.world.bounds.y = 0;
-
-		this.game.world.bounds.width = 400;
-
-		this.game.world.bounds.height = 600;
-
-
 
 		this.winimage = this.game.add.sprite(0,0,'win');
 

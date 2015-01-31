@@ -22,14 +22,12 @@ Block = function(game,x,y,type,color,scale){
 
 };
 
-var md = width/2;
-
 Block.prototype = {
 
 	setupsquares : function(){
 
 		this.squares.length = 0;
-
+		var md = blockWidth / 2;
 		
 
 		switch(this.blocktype){
@@ -124,31 +122,31 @@ Block.prototype = {
 
 		switch(dir){
 
-			case 'left' : 	this.centerX -= width;
+			case 'left' : 	this.centerX -= blockWidth;
 
 							for(var i=0;i<this.squares.length;i++){
 
-								this.squares[i].x -= width;
+								this.squares[i].x -= blockWidth;
 
 							}
 
 							break;
 
-			case 'right' : 	this.centerX += width;
+			case 'right' : 	this.centerX += blockWidth;
 
 							for(var i=0;i<this.squares.length;i++){
 
-								this.squares[i].x += width;
+								this.squares[i].x += blockWidth;
 
 							}
 
 							break;
 
-			case 'down' : 	this.centerY += height;
+			case 'down' : 	this.centerY += blockHeight;
 
 							for(var i=0;i<this.squares.length;i++){
 
-								this.squares[i].y += height;
+								this.squares[i].y += blockHeight;
 
 							}
 
@@ -263,6 +261,7 @@ Block.prototype = {
 	wallcollide : function(oldsquares,dir){
 
 		len = oldsquares.length;
+		var md = blockWidth / 2;
 
 		if(len==0){
 
@@ -288,7 +287,7 @@ Block.prototype = {
 
 				case 'down' : for(var i=0;i<4;i++){
 
-					if(this.squares[i].y+2*md>this.game.world.height) return true;
+					if(this.squares[i].y+2*md>this.game.world.bounds.height) return true;
 
 				}
 
@@ -364,13 +363,13 @@ Block.prototype = {
 
 		for(var i=0;i<4;i++){
 
-			if ( (arr[i*2] < this.game.world.bounds.x) ||  (arr[i*2] > this.game.world.bounds.width) ) return true;
+			if ( (arr[i*2] < this.game.world.bounds.x) ||  (arr[i*2] > this.game.width) ) return true;
 
-			if(arr[i*2+1]>this.game.world.bounds.height) return true;
+			if(arr[i*2+1]>this.game.height) return true;
 
 			for(var j=0;j<len;j++){
 
-				if ( ( Math.abs(arr[i*2] - oldsquares[j].x) < width ) && ( Math.abs(arr[i*2+1] - oldsquares[j].y) < height ) ){
+				if ( ( Math.abs(arr[i*2] - oldsquares[j].x) < blockWidth ) && ( Math.abs(arr[i*2+1] - oldsquares[j].y) < blockHeight ) ){
 
 					return true;
 

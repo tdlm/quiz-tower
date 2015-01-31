@@ -2,7 +2,8 @@ window.onload = function() {
 	var gameWidth = 400;
 	var gameHeight = 600;
 
-	var gamevar = new Phaser.Game(w,h,Phaser.AUTO,'container');
+
+	var gamevar = new Phaser.Game( gameWidth, gameHeight, Phaser.AUTO, 'container' );
 
 	gamevar.state.add('Load',Game.Load);
 

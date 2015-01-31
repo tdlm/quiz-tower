@@ -1,19 +1,32 @@
-/* Made by Nambiar - Game Dolphin 
+/*var defaultSettings = {
+	'oldsquares': new Array(),
+	'squaresinrow': new Array(),
+	'change_rot_time': 0,
+	'force_down': 0,
+	'slide_time': 
+}
+TODO: complete this defaultSettings thing... put all width/height/x/y/score/..... there
 
-Feel free to use and learn from */
+*/
+var oldsquares = new Array();
+var squaresinrow = new Array();
+var change_rot_time = 0;
+var force_down = 0;
+var slide_time = 0;
+var force_down_max_time = 500;
+var blockHeight = 30;
+var blockWidth = 30;
+
+var KEYLEFT;
+var KEYRIGHT;
+var KEYUP;
+var KEYDOWN;
 
 Game = {};
 
-var w = 400;
-var h = 600;
-var score = 0;
-var width = 30;
-var height = 30;
-var force_down_max_time = 500;
 
-Game.Load = function(game){
-
-};
+Game.PlayGame = function(game){};
+Game.Load = function(game){};
 
 Game.Load.prototype = {
 	preload : function(){
@@ -34,571 +47,8 @@ Game.Load.prototype = {
 	create : function(){
         this.game.state.start('MainMenu');
 	}
-};;/* Made by Nambiar - Game Dolphin 
-
-Feel free to use and learn from */
-
-Game.MainMenu = function(game){
-
-
-
 };
 
-
-
-Game.MainMenu.prototype = {
-
-	create : function(){
-
-		
-
-		this.game.world.bounds.x = 0;
-
-		this.game.world.bounds.y = 0;
-
-		this.game.world.bounds.width = 400;
-
-		this.game.world.bounds.height = 600;
-
-		this.playbutton = this.add.button(this.game.world.centerX, this.game.world.centerY-40,'play',this.playclicked,this,1,0,2);
-
-		this.playbutton.anchor.setTo(0.5,0.5);
-
-		this.tweenplay = this.game.add.tween(this.playbutton).to({y:300},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
-
-
-
-		this.arrows = this.game.add.sprite(this.game.world.centerX,this.game.world.centerY+180,'arrow');
-
-		this.arrows.anchor.setTo(0.5,0.5);
-
-		this.arrows.scale.setTo(0.6,0.6);
-
-	},
-
-
-
-	playclicked : function() {
-
-		score = 0;
-
-		this.game.state.start('Game');
-
-	},
-
-
-
-};
-
-
-
-
-
-Game.LoseScreen = function(game){
-
-
-
-};
-
-
-
-Game.LoseScreen.prototype = {
-
-	create : function(){
-
-		this.game.world.bounds.x = 0;
-
-		this.game.world.bounds.y = 0;
-
-		this.game.world.bounds.width = 400;
-
-		this.game.world.bounds.height = 600;
-
-		this.lose = this.game.add.sprite(this.game.world.centerX,this.game.world.centerY,'lose');
-
-		this.lose.anchor.setTo(0.5,0.5);
-
-		this.playbutton = this.add.button(this.game.world.centerX, 40, 'play',this.playclicked,this,1,0,2);
-
-		this.playbutton.anchor.setTo(0.5,0.5);
-
-		this.tweenplay = this.game.add.tween(this.playbutton).to({y:50},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
-
-		this.scoretextmain = this.add.text(this.game.world.centerX,450,score,{ font: "40px Arial", fill: "#fff", align: "center" })
-
-		this.scoretextmain.anchor.setTo(0.5,0.5);
-
-		
-
-	},
-
-	playclicked : function() {
-
-		score = 0;
-
-		this.game.state.start('Game');
-
-	},
-
-
-
-};
-
-
-
-Game.WinScreen = function(game){
-
-
-
-};
-
-
-
-Game.WinScreen.prototype = {
-
-	create : function(){
-
-		this.game.world.bounds.x = 0;
-
-		this.game.world.bounds.y = 0;
-
-		this.game.world.bounds.width = 400;
-
-		this.game.world.bounds.height = 600;
-
-
-
-		this.winimage = this.game.add.sprite(0,0,'win');
-
-		this.playbutton = this.add.button(this.game.world.centerX, 500, 'play',this.playclicked,this,1,0,2);
-
-		this.playbutton.anchor.setTo(0.5,0.5);
-
-		this.tweenplay = this.game.add.tween(this.playbutton).to({y:550},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
-
-		
-
-	},
-
-	playclicked : function() {
-
-		score = 0;
-
-		this.game.state.start('Game');
-
-	},
-
-};;/* Made by Nambiar - Game Dolphin 
-
-Feel free to use and learn from */
-
-Block = function(game,x,y,type,color,scale){
-
-	this.centerX = x;
-
-	this.centerY = y;
-
-	this.blocktype = type;	
-
-	this.blockcolor = color;
-
-	this.game = game;
-
-	this.squares = new Array();
-
-	this.scale = scale;
-
-	this.setupsquares();
-
-};
-
-var md = width/2;
-
-Block.prototype = {
-
-	setupsquares : function(){
-
-		this.squares.length = 0;
-
-		
-
-		switch(this.blocktype){
-
-			case 'o' : 	this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						break;
-
-			case 't' : 	this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
-
-						break;
-
-			case 'l' : 	this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						break;
-
-			case 'j' : 	this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						break;
-
-			case 'i' :  this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md*3,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						break;
-
-			case 's' :  this.squares[0] = this.game.add.sprite(this.centerX+md*3,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						break;
-
-			case 'z' :  this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
-
-						break;
-
-		}
-
-		for(var i=0;i<this.squares.length;i++){
-
-		this.squares[i].anchor.setTo(0.5,0.5);
-
-		this.squares[i].scale.setTo(this.scale,this.scale)
-
-		this.squares[i].collideWorldBounds = true;
-
-		}	
-
-	},
-
-
-
-	move : function(dir){
-
-		switch(dir){
-
-			case 'left' : 	this.centerX -= width;
-
-							for(var i=0;i<this.squares.length;i++){
-
-								this.squares[i].x -= width;
-
-							}
-
-							break;
-
-			case 'right' : 	this.centerX += width;
-
-							for(var i=0;i<this.squares.length;i++){
-
-								this.squares[i].x += width;
-
-							}
-
-							break;
-
-			case 'down' : 	this.centerY += height;
-
-							for(var i=0;i<this.squares.length;i++){
-
-								this.squares[i].y += height;
-
-							}
-
-							break;
-
-		}
-
-
-
-	},
-
-
-
-	rotate : function(){
-
-		var x1,x2,y1,y2;
-
-		for (var i=0; i<this.squares.length; i++){
-
-
-
-        // Get the center of the current square
-
-        	x1 = this.squares[i].x;
-
-        	y1 = this.squares[i].y;
-
-
-
-        // Move the square so it's positioned at the origin 
-
-        	x1 -= this.centerX;
-
-        	y1 -= this.centerY;
-
-        // Do the actual rotation
-
-        	x2 = - y1;
-
-        	y2 = x1;
-
-
-
-        // Move the square back to its proper location 
-
-        	x2 += this.centerX;
-
-        	y2 += this.centerY;
-
-
-
-        // Set the square's location to our temporary variables 
-
-        	this.squares[i].x = x2;
-
-        	this.squares[i].y = y2;
-
-    	}
-
-	},
-
-
-
-	getrotated : function(){
-
-		var temp_array = new Array();
-
-    	var x1, y1, x2, y2;
-
-
-
-    	for (var i=0; i<this.squares.length; i++){    
-
-        	x1 = this.squares[i].x;
-
-        	y1 = this.squares[i].y;
-
-        	x1 -= this.centerX;
-
-        	y1 -= this.centerY;
-
-
-
-        	x2 = - y1;
-
-        	y2 = x1;
-
-
-
-       		x2 += this.centerX;
-
-        	y2 += this.centerY;
-
-
-
-        // Instead of setting the squares, we just store the values
-
-        temp_array[i*2]   = x2;
-
-        temp_array[i*2+1] = y2;
-
-    	}
-
-
-
-    	return temp_array;
-
-	},
-
-
-
-	wallcollide : function(oldsquares,dir){
-
-		len = oldsquares.length;
-
-		if(len==0){
-
-			switch(dir){
-
-				case 'left' : for(var i=0;i<4;i++){
-
-					if(this.squares[i].x-2*md<this.game.world.bounds.x) return true;
-
-				}
-
-				break;
-
-
-
-				case 'right' : for(var i=0;i<4;i++){
-
-					if(this.squares[i].x+2*md>this.game.world.bounds.width) return true;
-
-				}
-
-				break;
-
-				case 'down' : for(var i=0;i<4;i++){
-
-					if(this.squares[i].y+2*md>this.game.world.height) return true;
-
-				}
-
-				break;
-
-				default : return false;
-
-
-
-			}
-
-		}else{
-
-		switch(dir){
-
-			case 'left'  : 	for(var i=0;i<4;i++){
-
-				for(var j=0;j<len;j++){
-
-					if(this.squares[i].x-md<this.game.world.bounds.x||(this.squares[i].x>oldsquares[j].x&&this.squares[i].x-3*md<oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) return true;
-
-				}
-
-			}
-
-			break;
-
-
-
-			case 'right' : 	for(var i=0;i<4;i++){
-
-				for(var j=0;j<len;j++){
-
-					if(this.squares[i].x+md>this.game.world.bounds.width||(this.squares[i].x<oldsquares[j].x&&this.squares[i].x+3*md>oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) return true;
-
-				}
-
-			}
-
-			break;
-
-
-
-			case 'down'  : 	for(var i=0;i<4;i++){
-
-				for(var j=0;j<len;j++){
-
-					if(this.squares[i].y+2*md>this.game.world.bounds.height||(this.squares[i].y+3*md>oldsquares[j].y&&this.squares[i].x==oldsquares[j].x)) return true;
-
-				}
-
-			}
-
-			break;
-
-
-
-			default 	 :  return false; 
-
-		}
-
-	}
-
-	},
-
-
-
-	rotatecollide : function(oldsquares){
-
-		var arr = this.getrotated();
-
-		var len = oldsquares.length;
-
-		for(var i=0;i<4;i++){
-
-			if ( (arr[i*2] < this.game.world.bounds.x) ||  (arr[i*2] > this.game.world.bounds.width) ) return true;
-
-			if(arr[i*2+1]>this.game.world.bounds.height) return true;
-
-			for(var j=0;j<len;j++){
-
-				if ( ( Math.abs(arr[i*2] - oldsquares[j].x) < width ) && ( Math.abs(arr[i*2+1] - oldsquares[j].y) < height ) ){
-
-					return true;
-
-            	}
-
-			}
-
-		}
-
-		return false;
-
-	}
-
-
-
-};;Game.PlayGame = function(game){
-	this.currentlevel;
-};
-/*var defaultSettings = {
-	'oldsquares': new Array(),
-	'squaresinrow': new Array(),
-	'change_rot_time': 0,
-	'force_down': 0,
-	'slide_time': 
-}
-TODO: complete this defaultSettings thing... put all width/height/x/y/score/..... there
-
-*/
-var oldsquares = new Array();
-var squaresinrow = new Array();
-var change_rot_time = 0;
-var force_down = 0;
-var slide_time = 0;
-
-var KEYLEFT;
-var KEYRIGHT;
-var KEYUP;
-var KEYDOWN;
 
 
 Game.PlayGame.prototype = {
@@ -611,9 +61,9 @@ Game.PlayGame.prototype = {
 
 		this.game.world.bounds.y = 0;
 
-		this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 400 : gameWidth;
+		this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 280 : gameWidth - 20;
 
-		this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 600 : gameHeight;
+		this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 590 : gameHeight - 10;
 
 		this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.chooseblock(),this.choosecolor(),1);
 
@@ -739,7 +189,7 @@ Game.PlayGame.prototype = {
 
 		}
 
-		var top = this.game.world.bounds.height - 19*height - height/2;
+		var top = this.game.world.bounds.height - 19 * blockHeight - blockHeight / 2;
 
 		var num_rows,rows;
 
@@ -747,7 +197,7 @@ Game.PlayGame.prototype = {
 
 		for(var i=0;i<oldsquares.length;i++){
 
-			row = (oldsquares[i].y - top)/height;
+			row = (oldsquares[i].y - top)/blockHeight;
 
 			squaresinrow[row]++;
 
@@ -765,7 +215,7 @@ Game.PlayGame.prototype = {
 
 				for(var j=0;j<oldsquares.length;j++){
 
-					if((oldsquares[j].y - top)/height==i){
+					if((oldsquares[j].y - top)/blockHeight==i){
 
 						oldsquares[j].destroy();
 
@@ -789,11 +239,11 @@ Game.PlayGame.prototype = {
 
 				if(squaresinrow[j]==9){
 
-					row = (oldsquares[i].y - top)/height;
+					row = (oldsquares[i].y - top)/blockHeight;
 
 					if(row<j){
 
-						oldsquares[i].y += height;
+						oldsquares[i].y += blockHeight;
 
 					}
 
@@ -907,11 +357,537 @@ Game.PlayGame.prototype = {
 
 };
 
-;window.onload = function() {
+;/* Made by Nambiar - Game Dolphin 
+
+Feel free to use and learn from */
+
+Game.MainMenu = function(game){
+
+
+
+};
+
+
+
+Game.MainMenu.prototype = {
+
+	create : function(){
+
+		
+
+		this.game.world.bounds.x = 0;
+
+		this.game.world.bounds.y = 0;
+
+		if ( typeof this.game.world.bounds.width == 'undefined' )
+			this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 400 : gameWidth;
+
+		if ( typeof this.game.world.bounds.height == 'undefined' )
+			this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 600 : gameHeight;
+
+		this.playbutton = this.add.button(this.game.world.centerX, this.game.world.centerY-40,'play',this.playclicked,this,1,0,2);
+
+		this.playbutton.anchor.setTo(0.5,0.5);
+
+		this.tweenplay = this.game.add.tween(this.playbutton).to({y:300},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
+
+
+
+		this.arrows = this.game.add.sprite(this.game.world.centerX,this.game.world.centerY+180,'arrow');
+
+		this.arrows.anchor.setTo(0.5,0.5);
+
+		this.arrows.scale.setTo(0.6,0.6);
+
+	},
+
+
+
+	playclicked : function() {
+
+		score = 0;
+
+		this.game.state.start('Game');
+
+	},
+
+
+
+};
+
+
+
+
+
+Game.LoseScreen = function(game){
+
+
+
+};
+
+
+
+Game.LoseScreen.prototype = {
+
+	create : function(){
+
+		this.lose = this.game.add.sprite(this.game.world.centerX,this.game.world.centerY,'lose');
+
+		this.lose.anchor.setTo(0.5,0.5);
+
+		this.playbutton = this.add.button(this.game.world.centerX, 40, 'play',this.playclicked,this,1,0,2);
+
+		this.playbutton.anchor.setTo(0.5,0.5);
+
+		this.tweenplay = this.game.add.tween(this.playbutton).to({y:50},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
+
+		this.scoretextmain = this.add.text(this.game.world.centerX,450,score,{ font: "40px Arial", fill: "#fff", align: "center" })
+
+		this.scoretextmain.anchor.setTo(0.5,0.5);
+
+		
+
+	},
+
+	playclicked : function() {
+
+		score = 0;
+
+		this.game.state.start('Game');
+
+	},
+
+
+
+};
+
+
+
+Game.WinScreen = function(game){
+
+
+
+};
+
+
+
+Game.WinScreen.prototype = {
+
+	create : function(){
+
+		this.winimage = this.game.add.sprite(0,0,'win');
+
+		this.playbutton = this.add.button(this.game.world.centerX, 500, 'play',this.playclicked,this,1,0,2);
+
+		this.playbutton.anchor.setTo(0.5,0.5);
+
+		this.tweenplay = this.game.add.tween(this.playbutton).to({y:550},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
+
+		
+
+	},
+
+	playclicked : function() {
+
+		score = 0;
+
+		this.game.state.start('Game');
+
+	},
+
+};;/* Made by Nambiar - Game Dolphin 
+
+Feel free to use and learn from */
+
+Block = function(game,x,y,type,color,scale){
+
+	this.centerX = x;
+
+	this.centerY = y;
+
+	this.blocktype = type;	
+
+	this.blockcolor = color;
+
+	this.game = game;
+
+	this.squares = new Array();
+
+	this.scale = scale;
+
+	this.setupsquares();
+
+};
+
+Block.prototype = {
+
+	setupsquares : function(){
+
+		this.squares.length = 0;
+		var md = blockWidth / 2;
+		
+
+		switch(this.blocktype){
+
+			case 'o' : 	this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+
+						break;
+
+			case 't' : 	this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
+
+						break;
+
+			case 'l' : 	this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
+
+						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
+
+						break;
+
+			case 'j' : 	this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
+
+						this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
+
+						break;
+
+			case 'i' :  this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md*3,'blocks',this.blockcolor);
+
+						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
+
+						break;
+
+			case 's' :  this.squares[0] = this.game.add.sprite(this.centerX+md*3,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+
+						break;
+
+			case 'z' :  this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+
+						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+
+						this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
+
+						break;
+
+		}
+
+		for(var i=0;i<this.squares.length;i++){
+
+		this.squares[i].anchor.setTo(0.5,0.5);
+
+		this.squares[i].scale.setTo(this.scale,this.scale)
+
+		this.squares[i].collideWorldBounds = true;
+
+		}	
+
+	},
+
+
+
+	move : function(dir){
+
+		switch(dir){
+
+			case 'left' : 	this.centerX -= blockWidth;
+
+							for(var i=0;i<this.squares.length;i++){
+
+								this.squares[i].x -= blockWidth;
+
+							}
+
+							break;
+
+			case 'right' : 	this.centerX += blockWidth;
+
+							for(var i=0;i<this.squares.length;i++){
+
+								this.squares[i].x += blockWidth;
+
+							}
+
+							break;
+
+			case 'down' : 	this.centerY += blockHeight;
+
+							for(var i=0;i<this.squares.length;i++){
+
+								this.squares[i].y += blockHeight;
+
+							}
+
+							break;
+
+		}
+
+
+
+	},
+
+
+
+	rotate : function(){
+
+		var x1,x2,y1,y2;
+
+		for (var i=0; i<this.squares.length; i++){
+
+
+
+        // Get the center of the current square
+
+        	x1 = this.squares[i].x;
+
+        	y1 = this.squares[i].y;
+
+
+
+        // Move the square so it's positioned at the origin 
+
+        	x1 -= this.centerX;
+
+        	y1 -= this.centerY;
+
+        // Do the actual rotation
+
+        	x2 = - y1;
+
+        	y2 = x1;
+
+
+
+        // Move the square back to its proper location 
+
+        	x2 += this.centerX;
+
+        	y2 += this.centerY;
+
+
+
+        // Set the square's location to our temporary variables 
+
+        	this.squares[i].x = x2;
+
+        	this.squares[i].y = y2;
+
+    	}
+
+	},
+
+
+
+	getrotated : function(){
+
+		var temp_array = new Array();
+
+    	var x1, y1, x2, y2;
+
+
+
+    	for (var i=0; i<this.squares.length; i++){    
+
+        	x1 = this.squares[i].x;
+
+        	y1 = this.squares[i].y;
+
+        	x1 -= this.centerX;
+
+        	y1 -= this.centerY;
+
+
+
+        	x2 = - y1;
+
+        	y2 = x1;
+
+
+
+       		x2 += this.centerX;
+
+        	y2 += this.centerY;
+
+
+
+        // Instead of setting the squares, we just store the values
+
+        temp_array[i*2]   = x2;
+
+        temp_array[i*2+1] = y2;
+
+    	}
+
+
+
+    	return temp_array;
+
+	},
+
+
+
+	wallcollide : function(oldsquares,dir){
+
+		len = oldsquares.length;
+		var md = blockWidth / 2;
+
+		if(len==0){
+
+			switch(dir){
+
+				case 'left' : for(var i=0;i<4;i++){
+
+					if(this.squares[i].x-2*md<this.game.world.bounds.x) return true;
+
+				}
+
+				break;
+
+
+
+				case 'right' : for(var i=0;i<4;i++){
+
+					if(this.squares[i].x+2*md>this.game.world.bounds.width) return true;
+
+				}
+
+				break;
+
+				case 'down' : for(var i=0;i<4;i++){
+
+					if(this.squares[i].y+2*md>this.game.world.bounds.height) return true;
+
+				}
+
+				break;
+
+				default : return false;
+
+
+
+			}
+
+		}else{
+
+		switch(dir){
+
+			case 'left'  : 	for(var i=0;i<4;i++){
+
+				for(var j=0;j<len;j++){
+
+					if(this.squares[i].x-md<this.game.world.bounds.x||(this.squares[i].x>oldsquares[j].x&&this.squares[i].x-3*md<oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) return true;
+
+				}
+
+			}
+
+			break;
+
+
+
+			case 'right' : 	for(var i=0;i<4;i++){
+
+				for(var j=0;j<len;j++){
+
+					if(this.squares[i].x+md>this.game.world.bounds.width||(this.squares[i].x<oldsquares[j].x&&this.squares[i].x+3*md>oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) return true;
+
+				}
+
+			}
+
+			break;
+
+
+
+			case 'down'  : 	for(var i=0;i<4;i++){
+
+				for(var j=0;j<len;j++){
+
+					if(this.squares[i].y+2*md>this.game.world.bounds.height||(this.squares[i].y+3*md>oldsquares[j].y&&this.squares[i].x==oldsquares[j].x)) return true;
+
+				}
+
+			}
+
+			break;
+
+
+
+			default 	 :  return false; 
+
+		}
+
+	}
+
+	},
+
+
+
+	rotatecollide : function(oldsquares){
+
+		var arr = this.getrotated();
+
+		var len = oldsquares.length;
+
+		for(var i=0;i<4;i++){
+
+			if ( (arr[i*2] < this.game.world.bounds.x) ||  (arr[i*2] > this.game.width) ) return true;
+
+			if(arr[i*2+1]>this.game.height) return true;
+
+			for(var j=0;j<len;j++){
+
+				if ( ( Math.abs(arr[i*2] - oldsquares[j].x) < blockWidth ) && ( Math.abs(arr[i*2+1] - oldsquares[j].y) < blockHeight ) ){
+
+					return true;
+
+            	}
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+
+
+};;window.onload = function() {
 	var gameWidth = 400;
 	var gameHeight = 600;
 
-	var gamevar = new Phaser.Game(w,h,Phaser.AUTO,'container');
+
+	var gamevar = new Phaser.Game( gameWidth, gameHeight, Phaser.AUTO, 'container' );
 
 	gamevar.state.add('Load',Game.Load);
 
