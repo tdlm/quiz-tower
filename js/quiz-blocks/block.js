@@ -27,7 +27,7 @@ Block.prototype = {
 	setupsquares : function(){
 
 		this.squares.length = 0;
-		var md = blockWidth / 2;
+		var md = ( blockWidth * this.scale ) / 2;
 		
 
 		switch(this.blocktype){

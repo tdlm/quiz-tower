@@ -91,7 +91,7 @@ Game.PlayGame.prototype = {
 
 		this.scoretext.anchor.setTo(0.5,0.5);
 
-		this.scoretextmain = this.add.text(344,370," "+score+" ",{ font: "15px Arial", fill: "#fff", align: "center" })
+		this.scoretextmain = this.add.text(344,370," "+score+" ",{ font: "25px Arial", fill: "#000", align: "center" })
 
 		
 
@@ -517,7 +517,7 @@ Block.prototype = {
 	setupsquares : function(){
 
 		this.squares.length = 0;
-		var md = blockWidth / 2;
+		var md = ( blockWidth * this.scale ) / 2;
 		
 
 		switch(this.blocktype){
