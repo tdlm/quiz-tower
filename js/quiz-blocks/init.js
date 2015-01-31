@@ -1,5 +1,6 @@
 window.onload = function() {
-	var w = 400, h = 600;
+	var gameWidth = 400;
+	var gameHeight = 600;
 
 	var gamevar = new Phaser.Game(w,h,Phaser.AUTO,'container');
 

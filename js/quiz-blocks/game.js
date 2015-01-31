@@ -1,35 +1,26 @@
-/* Made by Nambiar - Game Dolphin 
-
-Feel free to use and learn from */
-
 Game.PlayGame = function(game){
-
 	this.currentlevel;
-
 };
+/*var defaultSettings = {
+	'oldsquares': new Array(),
+	'squaresinrow': new Array(),
+	'change_rot_time': 0,
+	'force_down': 0,
+	'slide_time': 
+}
+TODO: complete this defaultSettings thing... put all width/height/x/y/score/..... there
 
-
-
+*/
 var oldsquares = new Array();
-
 var squaresinrow = new Array();
-
 var change_rot_time = 0;
-
 var force_down = 0;
-
 var slide_time = 0;
 
-
-
 var KEYLEFT;
-
 var KEYRIGHT;
-
 var KEYUP;
-
 var KEYDOWN;
-
 
 
 Game.PlayGame.prototype = {
@@ -42,9 +33,9 @@ Game.PlayGame.prototype = {
 
 		this.game.world.bounds.y = 0;
 
-		this.game.world.bounds.width = 280;
+		this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 400 : gameWidth;
 
-		this.game.world.bounds.height = 590;
+		this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 600 : gameHeight;
 
 		this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.chooseblock(),this.choosecolor(),1);
 
