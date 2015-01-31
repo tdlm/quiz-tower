@@ -1,7 +1,3 @@
-/* Made by Nambiar - Game Dolphin 
-
-Feel free to use and learn from */
-
 Block = function(game,x,y,type,color,scale){
 
 	this.centerX = x;
