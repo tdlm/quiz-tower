@@ -876,7 +876,7 @@ Block.prototype = {
 
 
 };;window.onload = function() {
-	var gameWidth = 400;
+	var gameWidth = 800;
 	var gameHeight = 600;
 
 
