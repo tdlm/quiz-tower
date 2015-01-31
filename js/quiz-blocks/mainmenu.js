@@ -13,9 +13,6 @@ Game.MainMenu = function(game){
 Game.MainMenu.prototype = {
 
 	create : function(){
-
-		
-
 		this.game.world.bounds.x = 0;
 
 		this.game.world.bounds.y = 0;
@@ -45,15 +42,9 @@ Game.MainMenu.prototype = {
 
 
 	playclicked : function() {
-
 		score = 0;
-
 		this.game.state.start('Game');
-
 	},
-
-
-
 };
 
 

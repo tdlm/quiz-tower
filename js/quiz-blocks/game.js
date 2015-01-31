@@ -16,6 +16,8 @@ var slide_time = 0;
 var force_down_max_time = 500;
 var blockHeight = 30;
 var blockWidth = 30;
+var gamePlayWidth = 280;
+var gamePlayHeight = 590;
 
 var KEYLEFT;
 var KEYRIGHT;
@@ -61,9 +63,9 @@ Game.PlayGame.prototype = {
 
 		this.game.world.bounds.y = 0;
 
-		this.game.world.bounds.width = typeof gameWidth == 'undefined' ? 280 : gameWidth - 20;
+		this.game.world.bounds.width = gamePlayWidth;
 
-		this.game.world.bounds.height = typeof gameHeight == 'undefined' ? 590 : gameHeight - 10;
+		this.game.world.bounds.height = gamePlayHeight;
 
 		this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.chooseblock(),this.choosecolor(),1);
 
