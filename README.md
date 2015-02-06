@@ -10,7 +10,7 @@ https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
 # install
 1. First step: 
-`git submodule init 
+`git submodule init && 
 git submodule update`
 
 2. Second step:
