@@ -75,6 +75,8 @@ Game.PlayGame.prototype = {
 
 		this.nextblock = new Block(this.game, 330, 271,this.nextblocktype,this.nextblockcolor,0.7);
 
+		this.question = new Question(this.game);
+
 
 
 		KEYRIGHT = this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
