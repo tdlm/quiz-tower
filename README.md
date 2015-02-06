@@ -9,18 +9,14 @@ https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
 
 # install
-1. First step:
-```
-git submodule init 
-git submodule update
-```
+1. First step: 
+`git submodule init 
+git submodule update`
 
 2. Second step:
-```
-npm install
+`npm install
 grunt
-```
+`
 3. Third step: run some local server (for example php miniserver) on the folder:
-```
-sudo php -S localhost:8080
-```
+`sudo php -S localhost:8080
+`
