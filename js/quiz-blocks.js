@@ -37,8 +37,6 @@ Game.Load.prototype = {
 		this.preloadtext.anchor.setTo(0.5,0.5);
 		var asset_dir = 'images';
 		this.load.spritesheet('play', asset_dir + '/play.png',100,80);
-		this.load.image('pause', asset_dir + '/Pause.png');
-		this.load.image('reset', asset_dir + '/refresh.png');
 		this.load.image('lose', asset_dir + '/lose.png');
 		this.load.image('arrow', asset_dir + '/arrow.png');
 		this.load.image('win', asset_dir + '/win.png');
@@ -56,12 +54,14 @@ Game.Load.prototype = {
 Game.PlayGame.prototype = {
 
 	create : function(){
-
+		
 		this.bck = this.game.add.sprite(0,0,'bck');
 		this.game.world.bounds.x = 21;
 		this.game.world.bounds.y = 0;
 		this.game.world.bounds.width = gamePlayWidth;
 		this.game.world.bounds.height = gamePlayHeight;
+
+		this.game.blockGroup = this.game.add.group();
 		this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.chooseblock(),this.choosecolor(),1);
 		this.nextblocktype = this.chooseblock();
 		this.nextblockcolor = this.choosecolor();
@@ -82,8 +82,7 @@ Game.PlayGame.prototype = {
 		score = 0;
 		this.force_down_max_time = force_down_max_time;
 
-		this.disable();		
-
+		this.disable();
 	},
 
 	pausebuttondown : function(){
@@ -291,7 +290,8 @@ Game.PlayGame.prototype = {
 			this.disableOverlay.beginFill( 0x000000, 0.7 ); //black, 0.7 transparency
 			this.disableOverlay.drawRect( 0, 0, md, this.game.height );
 			this.disableOverlay.endFill();
-			this.overlay = this.game.add.image( 0, 0, this.disableOverlay.generateTexture() );
+			this.disableOverlay = this.game.add.image( 0, 0, this.disableOverlay.generateTexture() );
+			this.disableOverlay.bringToTop();
 			this.disableStatus = true;
 		}
 	}
@@ -457,86 +457,56 @@ Block.prototype = {
 
 		switch(this.blocktype){
 
-			case 'o' : 	this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
+			case 'o' :
+				this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+				break;
+			case 't' :
+				this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
+				break;
 
-						this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						break;
-
-			case 't' : 	this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
-
-						break;
-
-			case 'l' : 	this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						break;
-
-			case 'j' : 	this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						break;
-
-			case 'i' :  this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md*3,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
-
-						break;
-
-			case 's' :  this.squares[0] = this.game.add.sprite(this.centerX+md*3,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
-
-						break;
-
-			case 'z' :  this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
-
-						this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
-
-						this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
-
-						break;
-
+			case 'l' : 
+				this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[2] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
+				this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
+				break;
+			case 'j' :
+				this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
+				this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md*3,'blocks',this.blockcolor);
+				break;
+			case 'i' :
+				this.squares[0] = this.game.add.sprite(this.centerX+md,this.centerY-md*3,'blocks',this.blockcolor);
+				this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[3] = this.game.add.sprite(this.centerX+md,this.centerY+md*3,'blocks',this.blockcolor);
+				break;
+			case 's' :
+				this.squares[0] = this.game.add.sprite(this.centerX+md*3,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[3] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
+				break;
+			case 'z' :
+				this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[1] = this.game.add.sprite(this.centerX+md,this.centerY-md,'blocks',this.blockcolor);
+				this.squares[2] = this.game.add.sprite(this.centerX+md,this.centerY+md,'blocks',this.blockcolor);
+				this.squares[3] = this.game.add.sprite(this.centerX+md*3,this.centerY+md,'blocks',this.blockcolor);
+				break;
 		}
 
-		for(var i=0;i<this.squares.length;i++){
-
-		this.squares[i].anchor.setTo(0.5,0.5);
-
-		this.squares[i].scale.setTo(this.scale,this.scale)
-
-		this.squares[i].collideWorldBounds = true;
-
+		for ( var i=0;i<this.squares.length;i++ ){
+			this.squares[i].anchor.setTo(0.5,0.5);
+			this.squares[i].scale.setTo(this.scale,this.scale)
+			this.squares[i].collideWorldBounds = true;
+			this.game.blockGroup.add( this.squares[i] );
 		}	
 
 	},
