@@ -115,39 +115,25 @@ Block.prototype = {
 
 
 	move : function(dir){
-
 		switch(dir){
-
-			case 'left' : 	this.centerX -= blockWidth;
-
-							for(var i=0;i<this.squares.length;i++){
-
-								this.squares[i].x -= blockWidth;
-
-							}
-
-							break;
-
-			case 'right' : 	this.centerX += blockWidth;
-
-							for(var i=0;i<this.squares.length;i++){
-
-								this.squares[i].x += blockWidth;
-
-							}
-
-							break;
-
-			case 'down' : 	this.centerY += blockHeight;
-
-							for(var i=0;i<this.squares.length;i++){
-
-								this.squares[i].y += blockHeight;
-
-							}
-
-							break;
-
+			case 'left' :
+			this.centerX -= blockWidth;
+			for(var i=0;i<this.squares.length;i++){
+				this.squares[i].x -= blockWidth;
+			}
+			break;
+			case 'right' :
+				this.centerX += blockWidth;
+				for(var i=0;i<this.squares.length;i++){
+					this.squares[i].x += blockWidth;
+				}
+				break;
+			case 'down' :
+				this.centerY += blockHeight;
+				for(var i=0;i<this.squares.length;i++){
+					this.squares[i].y += blockHeight;
+				}
+				break;
 		}
 
 

@@ -26,16 +26,20 @@ Question.prototype = {
 		this.game.add.text( 420, 20, question_title, question_title_style );
 		var answerLoc = 60;
 		for ( i in answers ) {
-			var answer = this.game.add.text( 420, answerLoc, answers[ i ], answers_style );
+			var answer = this.game.add.text( 420, answerLoc, answers[ i ][ 'value' ], answers_style );
 			answer.inputEnabled = true;
 			//Event for answer click
-			answer.events.onInputDown.add( this.answerClick, this );
+			answer.events.onInputDown.add( this.answerClick, { 'game': this.game, 'answer': answers[ i ] } );
+			answer.input.useHandCursor = true;
 			answerLoc += 40;
 		}
 	},
 	answerClick: function() {
-		//TODO: Handle right/wrong answers..
-		alert('BARF');
+		if ( typeof this.answer.correct !== 'undefined' ) {
+			alert('YOU ARE RIGHT');
+		} else {
+			alert('YOU ARE WRONG')
+		}
 	}
 };
 
