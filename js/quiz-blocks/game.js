@@ -17,12 +17,12 @@ var blockHeight = 30;
 var blockWidth = 30;
 var gamePlayWidth = 280;
 var gamePlayHeight = 590;
-var MILLISECONDS_IN_SECONDS = 1000;
 var KEYLEFT;
 var KEYRIGHT;
 var KEYUP;
 var KEYDOWN;
 
+var default_overlay_text = 'Answer to gain control!';
 Game = {};
 
 
@@ -74,7 +74,9 @@ Game.PlayGame.prototype = {
 
 		this.scoretext = this.add.text(344,355,"SCORE",{ font: "15px Arial", fill: "#ff0044", align: "center" });
 		this.scoretext.anchor.setTo(0.5,0.5);
-		this.scoretextmain = this.add.text(344,370," "+score+" ",{ font: "25px Arial", fill: "#000", align: "center" })
+		this.scoretextmain = this.add.text(344,390," "+score+" ",{ font: "25px Arial", fill: "#000", align: "center" })
+		this.scoretextmain.anchor.setTo(0.5,0.5);
+		this.default_overlay_text = default_overlay_text;
 
 		oldsquares.length = 0;
 		squaresinrow.length = 0;
@@ -100,25 +102,15 @@ Game.PlayGame.prototype = {
 	},
 
 	chooseblock : function(){
-
 		var x = Math.floor(Math.random()*7);
-
 		switch(x){
-
 			case 0 : return 'o';
-
 			case 1 : return 't';
-
 			case 2 : return 'l';
-
 			case 3 : return 'j';
-
 			case 4 : return 'i';
-
 			case 5 : return 's';
-
 			case 6 : return 'z';
-
 		}
 
 	},
@@ -169,11 +161,10 @@ Game.PlayGame.prototype = {
 
 	},
 
-	update : function(){
+	update: function(){
 		if ( this.game.time.now > this.next_refresh_time ) {
 			if ( this.focusblock.wallcollide( oldsquares,'down' ) != true ) {
 				this.focusblock.move('down');
-				this.getTimerValue();
 			} else {
 				for ( var i=0 ; i<4 ; i++ ) {
 					oldsquares.push(this.focusblock.squares[i]);
@@ -189,11 +180,11 @@ Game.PlayGame.prototype = {
 				if ( this.focusblock.wallcollide( oldsquares,'down' ) == true ) {
 					this.game.state.start('Lose');
 				}
-				this.getTimerValue( true );
-			}
 
-			if ( this.disableStatus ) {
-				this.timer_text.setText( this.timer_value );
+				this.force_down_max_time = force_down_max_time; //Resetting speed
+
+				this.question = new Question(this.game); //Generate new question
+				this.disable();
 			}
 
 			this.checkcompletedlines();
@@ -252,27 +243,13 @@ Game.PlayGame.prototype = {
 
 
 	},
-	getTimerValue: function( reset ) {
-		if ( typeof this.timer_value == 'undefined' || ( typeof reset !== 'undefined' && reset ) ) {
-			var seconds_left = this.force_down_max_time / 50;
-			this.timer_value = seconds_left;
-			this.timer_value_updated = new Date();
-		} else {
-			if ( this.timer_value ) {
-				var now = new Date();
-				//Waiting until 1 second has passed
-				if ( ( now - this.timer_value_updated ) / MILLISECONDS_IN_SECONDS >= 1 ) {
-					this.timer_value_updated = new Date();
-					this.timer_value -= 1;
-				}
-			}
-		}
-	},
-
-	disable: function( enable ) {
-		if ( typeof enable !== 'undefined' && enable ) {
+	
+	disable: function( disable ) {
+		if ( typeof disable !== 'undefined' && disable == false ) {
+			this.overlay_text.visible = false;
+			this.disableOverlay.visible = false;
 			this.disableStatus = false;
-		} else {
+		} else if ( typeof this.disableOverlay == 'undefined' || this.disableOverlay.game === null ) {
 			var md = this.game.width / 2;
 			this.disableOverlay = new Phaser.Graphics( this.game, 0 , 0 );
 			this.disableOverlay.beginFill( 0x000000, 0.7 ); //black, 0.7 transparency
@@ -282,10 +259,14 @@ Game.PlayGame.prototype = {
 			this.disableOverlay.bringToTop();
 			this.disableStatus = true;
 
-			//Timer part
+			//Message part!
 			var style = { font: "64px Arial", fill: "#990000", wordWrap: true, wordWrapWidth: md, align: "center" };
-			this.timer_text = this.game.add.text( md / 2, this.game.height / 3, '', style );
-			this.timer_text.anchor.set(0.5);
+			this.overlay_text = this.game.add.text( md / 2, this.game.height / 3, this.default_overlay_text, style );
+			this.overlay_text.anchor.set(0.5);
+		} else {
+			this.overlay_text.visible = true;
+			this.disableOverlay.visible = true;
+			this.disableStatus = true;
 		}
 	}
 
