@@ -11,14 +11,13 @@ TODO: complete this defaultSettings thing... put all width/height/x/y/score/....
 var oldsquares = new Array();
 var squaresinrow = new Array();
 var change_rot_time = 0;
-var force_down = 0;
 var slide_time = 0;
 var force_down_max_time = 500;
 var blockHeight = 30;
 var blockWidth = 30;
 var gamePlayWidth = 280;
 var gamePlayHeight = 590;
-
+var MILLISECONDS_IN_SECONDS = 1000;
 var KEYLEFT;
 var KEYRIGHT;
 var KEYUP;
@@ -81,6 +80,7 @@ Game.PlayGame.prototype = {
 		squaresinrow.length = 0;
 		score = 0;
 		this.force_down_max_time = force_down_max_time;
+		this.next_refresh_time = 0;
 
 		this.disable();
 	},
@@ -130,83 +130,50 @@ Game.PlayGame.prototype = {
 	},
 
 	checkcompletedlines : function(){
-
 		for(var i=0;i<20;i++){
-
 			squaresinrow[i]=0;
-
 		}
 
 		var top = this.game.world.bounds.height - 19 * blockHeight - blockHeight / 2;
-
 		var num_rows,rows;
 
-
-
 		for(var i=0;i<oldsquares.length;i++){
-
 			row = (oldsquares[i].y - top)/blockHeight;
-
 			squaresinrow[row]++;
-
 		}
-
-
 
 		for(var i=0;i<20;i++){
-
 			if(squaresinrow[i]==9){
-
 				console.log(score);
-
 				score+=100;
-
 				for(var j=0;j<oldsquares.length;j++){
-
 					if((oldsquares[j].y - top)/blockHeight==i){
-
 						oldsquares[j].destroy();
-
 						oldsquares.splice(j,1);
-
 						j--;
-
 					}
-
 				}
-
 			}
-
 		}
 
-
-
 		for(var i=0;i<oldsquares.length;i++){
-
 			for(var j=0;j<20;j++){
-
 				if(squaresinrow[j]==9){
-
 					row = (oldsquares[i].y - top)/blockHeight;
-
 					if(row<j){
-
 						oldsquares[i].y += blockHeight;
-
 					}
-
 				}
-
 			}
-
 		}
 
 	},
 
 	update : function(){
-		if ( this.game.time.now > force_down ) {
+		if ( this.game.time.now > this.next_refresh_time ) {
 			if ( this.focusblock.wallcollide( oldsquares,'down' ) != true ) {
 				this.focusblock.move('down');
+				this.getTimerValue();
 			} else {
 				for ( var i=0 ; i<4 ; i++ ) {
 					oldsquares.push(this.focusblock.squares[i]);
@@ -222,6 +189,11 @@ Game.PlayGame.prototype = {
 				if ( this.focusblock.wallcollide( oldsquares,'down' ) == true ) {
 					this.game.state.start('Lose');
 				}
+				this.getTimerValue( true );
+			}
+
+			if ( this.disableStatus ) {
+				this.timer_text.setText( this.timer_value );
 			}
 
 			this.checkcompletedlines();
@@ -232,7 +204,7 @@ Game.PlayGame.prototype = {
 				this.game.state.start('Win');
 			}
 
-			force_down = this.game.time.now + this.force_down_max_time;
+			this.next_refresh_time = this.game.time.now + this.force_down_max_time;
 
 		}
 		if ( ! this.disableStatus ) {
@@ -280,6 +252,22 @@ Game.PlayGame.prototype = {
 
 
 	},
+	getTimerValue: function( reset ) {
+		if ( typeof this.timer_value == 'undefined' || ( typeof reset !== 'undefined' && reset ) ) {
+			var seconds_left = this.force_down_max_time / 50;
+			this.timer_value = seconds_left;
+			this.timer_value_updated = new Date();
+		} else {
+			if ( this.timer_value ) {
+				var now = new Date();
+				//Waiting until 1 second has passed
+				if ( ( now - this.timer_value_updated ) / MILLISECONDS_IN_SECONDS >= 1 ) {
+					this.timer_value_updated = new Date();
+					this.timer_value -= 1;
+				}
+			}
+		}
+	},
 
 	disable: function( enable ) {
 		if ( typeof enable !== 'undefined' && enable ) {
@@ -293,6 +281,11 @@ Game.PlayGame.prototype = {
 			this.disableOverlay = this.game.add.image( 0, 0, this.disableOverlay.generateTexture() );
 			this.disableOverlay.bringToTop();
 			this.disableStatus = true;
+
+			//Timer part
+			var style = { font: "64px Arial", fill: "#990000", wordWrap: true, wordWrapWidth: md, align: "center" };
+			this.timer_text = this.game.add.text( md / 2, this.game.height / 3, '', style );
+			this.timer_text.anchor.set(0.5);
 		}
 	}
 
@@ -428,35 +421,26 @@ Game.WinScreen.prototype = {
 	},
 
 };;Block = function(game,x,y,type,color,scale){
-
 	this.centerX = x;
-
 	this.centerY = y;
 
 	this.blocktype = type;	
-
 	this.blockcolor = color;
 
 	this.game = game;
-
 	this.squares = new Array();
-
 	this.scale = scale;
-
+	this.squareBottomPos = 0; //To calculate the stepstocollide
 	this.setupsquares();
-
 };
 
 Block.prototype = {
-
 	setupsquares : function(){
 
 		this.squares.length = 0;
 		var md = ( blockWidth * this.scale ) / 2;
 		
-
 		switch(this.blocktype){
-
 			case 'o' :
 				this.squares[0] = this.game.add.sprite(this.centerX-md,this.centerY-md,'blocks',this.blockcolor);
 				this.squares[1] = this.game.add.sprite(this.centerX-md,this.centerY+md,'blocks',this.blockcolor);
@@ -504,14 +488,13 @@ Block.prototype = {
 
 		for ( var i=0;i<this.squares.length;i++ ){
 			this.squares[i].anchor.setTo(0.5,0.5);
-			this.squares[i].scale.setTo(this.scale,this.scale)
+			this.squares[i].scale.setTo(this.scale,this.scale);
 			this.squares[i].collideWorldBounds = true;
+			this.game.physics.enable( this.squares[i], Phaser.Physics.ARCADE );
+
 			this.game.blockGroup.add( this.squares[i] );
 		}	
-
 	},
-
-
 
 	move : function(dir){
 		switch(dir){
@@ -534,207 +517,134 @@ Block.prototype = {
 				}
 				break;
 		}
-
-
-
 	},
-
-
-
 	rotate : function(){
 
 		var x1,x2,y1,y2;
 
 		for (var i=0; i<this.squares.length; i++){
 
+		// Get the center of the current square
+		x1 = this.squares[i].x;
+		y1 = this.squares[i].y;
 
-
-        // Get the center of the current square
-
-        	x1 = this.squares[i].x;
-
-        	y1 = this.squares[i].y;
-
-
-
-        // Move the square so it's positioned at the origin 
-
-        	x1 -= this.centerX;
-
-        	y1 -= this.centerY;
+		// Move the square so it's positioned at the origin 
+		x1 -= this.centerX;
+		y1 -= this.centerY;
 
         // Do the actual rotation
-
-        	x2 = - y1;
-
-        	y2 = x1;
-
-
+		x2 = - y1;
+		y2 = x1;
 
         // Move the square back to its proper location 
-
-        	x2 += this.centerX;
-
-        	y2 += this.centerY;
-
-
+		x2 += this.centerX;
+		y2 += this.centerY;
 
         // Set the square's location to our temporary variables 
-
-        	this.squares[i].x = x2;
-
-        	this.squares[i].y = y2;
+		this.squares[i].x = x2;
+		this.squares[i].y = y2;
 
     	}
-
 	},
 
-
-
 	getrotated : function(){
-
 		var temp_array = new Array();
-
     	var x1, y1, x2, y2;
 
-
-
     	for (var i=0; i<this.squares.length; i++){    
+			x1 = this.squares[i].x;
+			y1 = this.squares[i].y;
+			x1 -= this.centerX;
+			y1 -= this.centerY;
 
-        	x1 = this.squares[i].x;
+			x2 = - y1;
+			y2 = x1;
 
-        	y1 = this.squares[i].y;
+			x2 += this.centerX;
+			y2 += this.centerY;
 
-        	x1 -= this.centerX;
-
-        	y1 -= this.centerY;
-
-
-
-        	x2 = - y1;
-
-        	y2 = x1;
-
-
-
-       		x2 += this.centerX;
-
-        	y2 += this.centerY;
-
-
-
-        // Instead of setting the squares, we just store the values
-
-        temp_array[i*2]   = x2;
-
-        temp_array[i*2+1] = y2;
-
+			// Instead of setting the squares, we just store the values
+			temp_array[i*2]   = x2;
+			temp_array[i*2+1] = y2;
     	}
 
 
 
     	return temp_array;
-
 	},
 
-
+	//How many steps to collide the lower edge
+	stepstocollide : function( oldsquares ) {
+		//this.game.world.
+	},
 
 	wallcollide : function(oldsquares,dir){
 
 		len = oldsquares.length;
 		var md = blockWidth / 2;
 
-		if(len==0){
-
-			switch(dir){
-
-				case 'left' : for(var i=0;i<4;i++){
-
-					if(this.squares[i].x-2*md<this.game.world.bounds.x) return true;
-
-				}
-
+		if ( len==0 ){
+			switch( dir ) {
+				case 'left' : 
+					for(var i=0;i<4;i++){
+						if(this.squares[i].x-2*md<this.game.world.bounds.x) 
+							return true;
+					}
 				break;
-
-
-
-				case 'right' : for(var i=0;i<4;i++){
-
-					if(this.squares[i].x+2*md>this.game.world.bounds.width) return true;
-
-				}
-
+				case 'right' : 
+					for(var i=0;i<4;i++){
+						if(this.squares[i].x+2*md>this.game.world.bounds.width) 
+							return true;
+					}
 				break;
-
-				case 'down' : for(var i=0;i<4;i++){
-
-					if(this.squares[i].y+2*md>this.game.world.bounds.height) return true;
-
-				}
-
+				case 'down' : 
+					for(var i=0;i<4;i++){
+						if ( this.squares[i].y+2*md>this.game.world.bounds.height ) {
+							if ( this.squares[i].y > this.squareBottomPos ) {
+								this.squareBottomPos = this.squares[i].y;
+							}
+							return true;
+						}
+							
+					}
 				break;
-
 				default : return false;
-
-
-
 			}
-
-		}else{
-
-		switch(dir){
-
-			case 'left'  : 	for(var i=0;i<4;i++){
-
-				for(var j=0;j<len;j++){
-
-					if(this.squares[i].x-md<this.game.world.bounds.x||(this.squares[i].x>oldsquares[j].x&&this.squares[i].x-3*md<oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) return true;
-
+		} else {
+			switch( dir ){
+				case 'left'  : 	
+					for(var i=0;i<4;i++){
+						for(var j=0;j<len;j++){
+							if(this.squares[i].x-md<this.game.world.bounds.x||(this.squares[i].x>oldsquares[j].x&&this.squares[i].x-3*md<oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) 
+								return true;
+						}
+					}
+				break;
+				case 'right' : 	
+					for(var i=0;i<4;i++){
+						for(var j=0;j<len;j++){
+							if(this.squares[i].x+md>this.game.world.bounds.width||(this.squares[i].x<oldsquares[j].x&&this.squares[i].x+3*md>oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) 
+								return true;
+					}
 				}
+				break;
+				case 'down'  : 	
+					for(var i=0;i<4;i++){
+						for(var j=0;j<len;j++){
+							if(this.squares[i].y+2*md>this.game.world.bounds.height||(this.squares[i].y+3*md>oldsquares[j].y&&this.squares[i].x==oldsquares[j].x)) {
+								if ( this.squares[i].y > this.squareBottomPos ) {
+									this.squareBottomPos = this.squares[i].y;
+								}
+								return true;
+							}
+						}
 
+					}
+				break;
+				default 	 :  return false; 
 			}
-
-			break;
-
-
-
-			case 'right' : 	for(var i=0;i<4;i++){
-
-				for(var j=0;j<len;j++){
-
-					if(this.squares[i].x+md>this.game.world.bounds.width||(this.squares[i].x<oldsquares[j].x&&this.squares[i].x+3*md>oldsquares[j].x&&this.squares[i].y==oldsquares[j].y)) return true;
-
-				}
-
-			}
-
-			break;
-
-
-
-			case 'down'  : 	for(var i=0;i<4;i++){
-
-				for(var j=0;j<len;j++){
-
-					if(this.squares[i].y+2*md>this.game.world.bounds.height||(this.squares[i].y+3*md>oldsquares[j].y&&this.squares[i].x==oldsquares[j].x)) return true;
-
-				}
-
-			}
-
-			break;
-
-
-
-			default 	 :  return false; 
-
 		}
-
-	}
-
 	},
-
-
 
 	rotatecollide : function(oldsquares){
 
@@ -761,7 +671,6 @@ Block.prototype = {
 		}
 
 		return false;
-
 	}
 
 

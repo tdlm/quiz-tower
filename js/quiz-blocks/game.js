@@ -11,14 +11,13 @@ TODO: complete this defaultSettings thing... put all width/height/x/y/score/....
 var oldsquares = new Array();
 var squaresinrow = new Array();
 var change_rot_time = 0;
-var force_down = 0;
 var slide_time = 0;
 var force_down_max_time = 500;
 var blockHeight = 30;
 var blockWidth = 30;
 var gamePlayWidth = 280;
 var gamePlayHeight = 590;
-
+var MILLISECONDS_IN_SECONDS = 1000;
 var KEYLEFT;
 var KEYRIGHT;
 var KEYUP;
@@ -81,6 +80,7 @@ Game.PlayGame.prototype = {
 		squaresinrow.length = 0;
 		score = 0;
 		this.force_down_max_time = force_down_max_time;
+		this.next_refresh_time = 0;
 
 		this.disable();
 	},
@@ -130,83 +130,50 @@ Game.PlayGame.prototype = {
 	},
 
 	checkcompletedlines : function(){
-
 		for(var i=0;i<20;i++){
-
 			squaresinrow[i]=0;
-
 		}
 
 		var top = this.game.world.bounds.height - 19 * blockHeight - blockHeight / 2;
-
 		var num_rows,rows;
 
-
-
 		for(var i=0;i<oldsquares.length;i++){
-
 			row = (oldsquares[i].y - top)/blockHeight;
-
 			squaresinrow[row]++;
-
 		}
-
-
 
 		for(var i=0;i<20;i++){
-
 			if(squaresinrow[i]==9){
-
 				console.log(score);
-
 				score+=100;
-
 				for(var j=0;j<oldsquares.length;j++){
-
 					if((oldsquares[j].y - top)/blockHeight==i){
-
 						oldsquares[j].destroy();
-
 						oldsquares.splice(j,1);
-
 						j--;
-
 					}
-
 				}
-
 			}
-
 		}
 
-
-
 		for(var i=0;i<oldsquares.length;i++){
-
 			for(var j=0;j<20;j++){
-
 				if(squaresinrow[j]==9){
-
 					row = (oldsquares[i].y - top)/blockHeight;
-
 					if(row<j){
-
 						oldsquares[i].y += blockHeight;
-
 					}
-
 				}
-
 			}
-
 		}
 
 	},
 
 	update : function(){
-		if ( this.game.time.now > force_down ) {
+		if ( this.game.time.now > this.next_refresh_time ) {
 			if ( this.focusblock.wallcollide( oldsquares,'down' ) != true ) {
 				this.focusblock.move('down');
+				this.getTimerValue();
 			} else {
 				for ( var i=0 ; i<4 ; i++ ) {
 					oldsquares.push(this.focusblock.squares[i]);
@@ -222,6 +189,11 @@ Game.PlayGame.prototype = {
 				if ( this.focusblock.wallcollide( oldsquares,'down' ) == true ) {
 					this.game.state.start('Lose');
 				}
+				this.getTimerValue( true );
+			}
+
+			if ( this.disableStatus ) {
+				this.timer_text.setText( this.timer_value );
 			}
 
 			this.checkcompletedlines();
@@ -232,7 +204,7 @@ Game.PlayGame.prototype = {
 				this.game.state.start('Win');
 			}
 
-			force_down = this.game.time.now + this.force_down_max_time;
+			this.next_refresh_time = this.game.time.now + this.force_down_max_time;
 
 		}
 		if ( ! this.disableStatus ) {
@@ -280,6 +252,22 @@ Game.PlayGame.prototype = {
 
 
 	},
+	getTimerValue: function( reset ) {
+		if ( typeof this.timer_value == 'undefined' || ( typeof reset !== 'undefined' && reset ) ) {
+			var seconds_left = this.force_down_max_time / 50;
+			this.timer_value = seconds_left;
+			this.timer_value_updated = new Date();
+		} else {
+			if ( this.timer_value ) {
+				var now = new Date();
+				//Waiting until 1 second has passed
+				if ( ( now - this.timer_value_updated ) / MILLISECONDS_IN_SECONDS >= 1 ) {
+					this.timer_value_updated = new Date();
+					this.timer_value -= 1;
+				}
+			}
+		}
+	},
 
 	disable: function( enable ) {
 		if ( typeof enable !== 'undefined' && enable ) {
@@ -293,6 +281,11 @@ Game.PlayGame.prototype = {
 			this.disableOverlay = this.game.add.image( 0, 0, this.disableOverlay.generateTexture() );
 			this.disableOverlay.bringToTop();
 			this.disableStatus = true;
+
+			//Timer part
+			var style = { font: "64px Arial", fill: "#990000", wordWrap: true, wordWrapWidth: md, align: "center" };
+			this.timer_text = this.game.add.text( md / 2, this.game.height / 3, '', style );
+			this.timer_text.anchor.set(0.5);
 		}
 	}
 
