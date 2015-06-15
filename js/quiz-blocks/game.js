@@ -11,19 +11,18 @@ TODO: complete this defaultSettings thing... put all width/height/x/y/score/....
 var oldsquares = new Array();
 var squaresinrow = new Array();
 var change_rot_time = 0;
-var force_down = 0;
 var slide_time = 0;
 var force_down_max_time = 500;
 var blockHeight = 30;
 var blockWidth = 30;
 var gamePlayWidth = 280;
 var gamePlayHeight = 590;
-
 var KEYLEFT;
 var KEYRIGHT;
 var KEYUP;
 var KEYDOWN;
 
+var default_overlay_text = 'Answer to gain control!';
 Game = {};
 
 
@@ -37,8 +36,6 @@ Game.Load.prototype = {
 		this.preloadtext.anchor.setTo(0.5,0.5);
 		var asset_dir = 'images';
 		this.load.spritesheet('play', asset_dir + '/play.png',100,80);
-		this.load.image('pause', asset_dir + '/Pause.png');
-		this.load.image('reset', asset_dir + '/refresh.png');
 		this.load.image('lose', asset_dir + '/lose.png');
 		this.load.image('arrow', asset_dir + '/arrow.png');
 		this.load.image('win', asset_dir + '/win.png');
@@ -56,90 +53,47 @@ Game.Load.prototype = {
 Game.PlayGame.prototype = {
 
 	create : function(){
-
+		
 		this.bck = this.game.add.sprite(0,0,'bck');
-
 		this.game.world.bounds.x = 21;
-
 		this.game.world.bounds.y = 0;
-
 		this.game.world.bounds.width = gamePlayWidth;
-
 		this.game.world.bounds.height = gamePlayHeight;
 
+		this.game.blockGroup = this.game.add.group();
 		this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.chooseblock(),this.choosecolor(),1);
-
 		this.nextblocktype = this.chooseblock();
-
 		this.nextblockcolor = this.choosecolor();
-
 		this.nextblock = new Block(this.game, 330, 271,this.nextblocktype,this.nextblockcolor,0.7);
-
 		this.question = new Question(this.game);
 
-
-
 		KEYRIGHT = this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
-
 		KEYLEFT = this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-
 		KEYUP = this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
-
 		KEYDOWN = this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
 
-		
-
 		this.scoretext = this.add.text(344,355,"SCORE",{ font: "15px Arial", fill: "#ff0044", align: "center" });
-
 		this.scoretext.anchor.setTo(0.5,0.5);
-
-		this.scoretextmain = this.add.text(344,370," "+score+" ",{ font: "25px Arial", fill: "#000", align: "center" })
-
-		
-
-		this.resetbutton = this.add.sprite(320,520,'reset');
-
-		this.pausebutton = this.add.sprite(320,460,'pause');
-
-		this.pausebutton.inputEnabled = true;
-
-		this.resetbutton.inputEnabled = true;
-
-		this.pausebutton.events.onInputDown.add(this.pausebuttondown,this.pausebutton);
-
-		this.resetbutton.events.onInputDown.add(this.resetbuttondown,this.resetbutton);
-
-
+		this.scoretextmain = this.add.text(344,390," "+score+" ",{ font: "25px Arial", fill: "#000", align: "center" })
+		this.scoretextmain.anchor.setTo(0.5,0.5);
+		this.default_overlay_text = default_overlay_text;
 
 		oldsquares.length = 0;
-
 		squaresinrow.length = 0;
-
 		score = 0;
+		this.force_down_max_time = force_down_max_time;
+		this.next_refresh_time = 0;
 
-		
-
+		this.disable();
 	},
 
 	pausebuttondown : function(){
-
-		if(this.game.paused==false)
-
-		{
-
+		if ( this.game.paused == false ) {
 			this.game.paused = true;
-
-		} 
-
-		else
-
-		{ this.game.paused = false;
-
+		} else { 
+			this.game.paused = false;
 		}
-
 	},
-
-
 
 	resetbuttondown : function(){
 
@@ -147,35 +101,19 @@ Game.PlayGame.prototype = {
 
 	},
 
-
-
-
-
 	chooseblock : function(){
-
 		var x = Math.floor(Math.random()*7);
-
 		switch(x){
-
 			case 0 : return 'o';
-
 			case 1 : return 't';
-
 			case 2 : return 'l';
-
 			case 3 : return 'j';
-
 			case 4 : return 'i';
-
 			case 5 : return 's';
-
 			case 6 : return 'z';
-
 		}
 
 	},
-
-
 
 	choosecolor : function(){
 
@@ -183,180 +121,153 @@ Game.PlayGame.prototype = {
 
 	},
 
-
-
 	checkcompletedlines : function(){
-
 		for(var i=0;i<20;i++){
-
 			squaresinrow[i]=0;
-
 		}
 
 		var top = this.game.world.bounds.height - 19 * blockHeight - blockHeight / 2;
-
 		var num_rows,rows;
 
-
-
 		for(var i=0;i<oldsquares.length;i++){
-
 			row = (oldsquares[i].y - top)/blockHeight;
-
 			squaresinrow[row]++;
-
 		}
-
-
 
 		for(var i=0;i<20;i++){
-
 			if(squaresinrow[i]==9){
-
 				console.log(score);
-
 				score+=100;
-
 				for(var j=0;j<oldsquares.length;j++){
-
 					if((oldsquares[j].y - top)/blockHeight==i){
-
 						oldsquares[j].destroy();
-
 						oldsquares.splice(j,1);
-
 						j--;
-
 					}
-
 				}
-
 			}
-
 		}
 
-
-
 		for(var i=0;i<oldsquares.length;i++){
-
 			for(var j=0;j<20;j++){
-
 				if(squaresinrow[j]==9){
-
 					row = (oldsquares[i].y - top)/blockHeight;
-
 					if(row<j){
-
 						oldsquares[i].y += blockHeight;
-
 					}
-
 				}
-
 			}
-
 		}
 
 	},
 
-
-
-	update : function(){
-
-		if(this.game.time.now>force_down)
-
-		{
-
-			if(this.focusblock.wallcollide(oldsquares,'down')!=true)	this.focusblock.move('down');
-
-			else{
-
-				for(var i=0;i<4;i++){
-
+	update: function(){
+		if ( this.game.time.now > this.next_refresh_time ) {
+			if ( this.focusblock.wallcollide( oldsquares,'down' ) != true ) {
+				this.focusblock.move('down');
+			} else {
+				for ( var i=0 ; i<4 ; i++ ) {
 					oldsquares.push(this.focusblock.squares[i]);
-
 				}
-
 				this.focusblock = new Block(this.game,this.game.world.centerX,-40,this.nextblocktype,this.nextblockcolor,1);
-
 				this.nextblocktype = this.chooseblock();
-
 				this.nextblockcolor = this.choosecolor();
-
-				for(var i=0;i<4;i++){
-
+				for ( var i=0 ; i<4 ; i++ ) {
 					this.nextblock.squares[i].destroy();
-
 				}
 
 				this.nextblock = new Block(this.game, 330, 271,this.nextblocktype,this.nextblockcolor,0.7);
+				if ( this.focusblock.wallcollide( oldsquares,'down' ) == true ) {
+					this.game.state.start('Lose');
+				}
 
-				if(this.focusblock.wallcollide(oldsquares,'down')==true) { this.game.state.start('Lose');}
+				this.force_down_max_time = force_down_max_time; //Resetting speed
 
+				this.question = new Question(this.game); //Generate new question
+				this.disable();
 			}
 
 			this.checkcompletedlines();
 
 			this.scoretextmain.setText(score);
 
-			if(score>1900){ this.game.state.start('Win');
-
+			if ( score>1900 ) { 
+				this.game.state.start('Win');
 			}
 
-			force_down = this.game.time.now + force_down_max_time;
+			this.next_refresh_time = this.game.time.now + this.force_down_max_time;
 
 		}
+		if ( ! this.disableStatus ) {
+			if ( KEYRIGHT.isDown ){
 
-		if(KEYRIGHT.isDown){
+				if(this.game.time.now>change_rot_time){
 
-			if(this.game.time.now>change_rot_time){
-
-			if(this.focusblock.wallcollide(oldsquares,'right')!=true)	this.focusblock.move('right');
-
-			change_rot_time = this.game.time.now + 100;
-
-			}
-
-		}
-
-		if(KEYLEFT.isDown){
-
-			if(this.game.time.now>change_rot_time){
-
-			if(this.focusblock.wallcollide(oldsquares,'left')!=true)	this.focusblock.move('left');
-
-			change_rot_time = this.game.time.now + 100;
-
-			}
-
-		}
-
-		if(KEYUP.isDown){
-
-			if(this.game.time.now>change_rot_time){
-
-				if(this.focusblock.rotatecollide(oldsquares)!=true)		this.focusblock.rotate(); 
+				if(this.focusblock.wallcollide(oldsquares,'right')!=true)	this.focusblock.move('right');
 
 				change_rot_time = this.game.time.now + 100;
 
+				}
+
 			}
 
+			if ( KEYLEFT.isDown ){
+
+				if(this.game.time.now>change_rot_time){
+
+				if(this.focusblock.wallcollide(oldsquares,'left')!=true)	this.focusblock.move('left');
+
+				change_rot_time = this.game.time.now + 100;
+
+				}
+
+			}
+
+			if ( KEYUP.isDown ){
+				if ( this.game.time.now > change_rot_time ){
+					if ( this.focusblock.rotatecollide(oldsquares) != true) {
+						this.focusblock.rotate(); 
+					}
+					change_rot_time = this.game.time.now + 100;
+				}
+
+			}
+
+			if ( KEYDOWN.isDown ){
+				this.force_down_max_time = force_down_max_time / 10;
+			} else {
+				this.force_down_max_time = force_down_max_time;
+			}
 		}
 
-		if(KEYDOWN.isDown){
 
-			force_down_max_time = 50;
 
+	},
+	
+	disable: function( disable ) {
+		if ( typeof disable !== 'undefined' && disable == false ) {
+			this.overlay_text.visible = false;
+			this.disableOverlay.visible = false;
+			this.disableStatus = false;
+		} else if ( typeof this.disableOverlay == 'undefined' || this.disableOverlay.game === null ) {
+			var md = this.game.width / 2;
+			this.disableOverlay = new Phaser.Graphics( this.game, 0 , 0 );
+			this.disableOverlay.beginFill( 0x000000, 0.7 ); //black, 0.7 transparency
+			this.disableOverlay.drawRect( 0, 0, md, this.game.height );
+			this.disableOverlay.endFill();
+			this.disableOverlay = this.game.add.image( 0, 0, this.disableOverlay.generateTexture() );
+			this.disableOverlay.bringToTop();
+			this.disableStatus = true;
+
+			//Message part!
+			var style = { font: "64px Arial", fill: "#990000", wordWrap: true, wordWrapWidth: md, align: "center" };
+			this.overlay_text = this.game.add.text( md / 2, this.game.height / 3, this.default_overlay_text, style );
+			this.overlay_text.anchor.set(0.5);
+		} else {
+			this.overlay_text.visible = true;
+			this.disableOverlay.visible = true;
+			this.disableStatus = true;
 		}
-
-		else {
-
-			force_down_max_time = 500;
-
-		}
-
-
-
 	}
 
 };
